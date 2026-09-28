@@ -3,6 +3,7 @@ using HarmonyLib;
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace StupidTemplate.Patches
@@ -11,11 +12,15 @@ namespace StupidTemplate.Patches
     {
         public static bool IsPatched { get; private set; }
         public static int PatchErrors { get; private set; }
+        public static bool HasPatchErrors => PatchErrors > 0;
+        public static IReadOnlyList<string> PatchFailures => patchFailures.AsReadOnly();
 
         public static void PatchAll()
         {
             if (!IsPatched)
             {
+                PatchErrors = 0;
+                patchFailures.Clear();
                 instance ??= new Harmony(PluginInfo.GUID);
 
                 Type[] types;
@@ -40,21 +45,33 @@ namespace StupidTemplate.Patches
                     catch (Exception ex)
                     {
                         PatchErrors++;
-                        Debug.LogError($"Failed to patch {type.FullName}: {ex}");
+                        string failure = $"{type.FullName}: {ex.Message}";
+                        patchFailures.Add(failure);
+                        Debug.LogError($"Failed to patch {failure}");
                     }
                 }
 
-                Debug.Log($"Patch pass complete: {PatchErrors} error(s).");
-
                 IsPatched = true;
+
+                if (PatchErrors == 0)
+                    Debug.Log("Patch pass complete: all discovered Harmony patches applied successfully.");
+                else
+                    Debug.LogWarning($"Patch pass complete with {PatchErrors} error(s). Plugin remains running with a partial patch set.");
             }
         }
 
         public static void UnpatchAll()
         {
-            if (instance != null && IsPatched)
+            if (instance == null)
+                return;
+
+            try
             {
-                instance.UnpatchSelf();
+                if (IsPatched)
+                    instance.UnpatchSelf();
+            }
+            finally
+            {
                 IsPatched = false;
                 instance = null;
             }
@@ -88,6 +105,7 @@ namespace StupidTemplate.Patches
         }
 
         private static Harmony instance;
+        private static readonly List<string> patchFailures = new List<string>();
         public const string InstanceId = PluginInfo.GUID;
     }
 }
