@@ -81,7 +81,34 @@ namespace StupidTemplate
             Mods.Settings.Movement.ApplyFlySpeed();
             ThemeManager.ApplyTheme(Settings.themeIndex);
             Settings.ApplyMenuScale();
+            SyncButtonStates();
             Save();
+        }
+        private static void SyncButtonStates()
+        {
+            try
+            {
+                var rightHand = Menu.Buttons.GetIndex("Right Hand");
+                if (rightHand != null)
+                    rightHand.enabled = Settings.rightHanded;
+
+                var notifications = Menu.Buttons.GetIndex("Notifications");
+                if (notifications != null)
+                    notifications.enabled = !Settings.disableNotifications;
+
+                var fps = Menu.Buttons.GetIndex("FPS Counter");
+                if (fps != null)
+                    fps.enabled = Settings.fpsCounter;
+
+                var disconnect = Menu.Buttons.GetIndex("Disconnect Button");
+                if (disconnect != null)
+                    disconnect.enabled = Settings.disconnectButton;
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[{PluginInfo.Name}] Failed to sync settings buttons: {ex.Message}");
+            }
         }
     }
 }
+
