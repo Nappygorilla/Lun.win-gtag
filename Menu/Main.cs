@@ -603,11 +603,14 @@ namespace StupidTemplate.Menu
 
         public static void WorldScale(GameObject obj, Vector3 targetWorldScale)
         {
+            if (obj == null || obj.transform.parent == null)
+                return;
+
             Vector3 parentScale = obj.transform.parent.lossyScale;
             obj.transform.localScale = new Vector3(
-                targetWorldScale.x / parentScale.x,
-                targetWorldScale.y / parentScale.y,
-                targetWorldScale.z / parentScale.z
+                Mathf.Abs(parentScale.x) > Mathf.Epsilon ? targetWorldScale.x / parentScale.x : targetWorldScale.x,
+                Mathf.Abs(parentScale.y) > Mathf.Epsilon ? targetWorldScale.y / parentScale.y : targetWorldScale.y,
+                Mathf.Abs(parentScale.z) > Mathf.Epsilon ? targetWorldScale.z / parentScale.z : targetWorldScale.z
             );
         }
 
@@ -644,7 +647,7 @@ namespace StupidTemplate.Menu
                 catch { }
                 float size = 0.025f;
                 side.transform.SetParent(platform.transform);
-                side.transform.position = localPositions[i] * (size / 2);
+                side.transform.localPosition = localPositions[i] * (size / 2);
                 side.transform.rotation = localRotations[i];
                 WorldScale(side, new Vector3(size, size, 0.01f));
                 side.GetComponent<Renderer>().enabled = false;
@@ -677,7 +680,7 @@ namespace StupidTemplate.Menu
             Vector3 Direction = GunTransform.forward;
 
             Physics.Raycast(StartPosition + Direction / 4f, Direction, out var Ray, 512f, overrideLayerMask ?? NoInvisLayerMask());
-            Vector3 EndPosition = gunLocked ? lockTarget.transform.position : Ray.point;
+            Vector3 EndPosition = gunLocked && lockTarget != null ? lockTarget.transform.position : Ray.point;
 
             if (EndPosition == Vector3.zero)
                 EndPosition = StartPosition + Direction * 512f;
@@ -690,8 +693,13 @@ namespace StupidTemplate.Menu
             GunPointer.transform.position = EndPosition;
 
             Renderer PointerRenderer = GunPointer.GetComponent<Renderer>();
-            PointerRenderer.material.shader = Shader.Find("GUI/Text Shader");
-            PointerRenderer.material.color = gunLocked || ControllerInputPoller.TriggerFloat(XRNode.RightHand) > 0.5f ? buttonColors[1].GetCurrentColor() : buttonColors[0].GetCurrentColor();
+            if (PointerRenderer != null)
+            {
+                Shader pointerShader = Shader.Find("GUI/Text Shader");
+                if (pointerShader != null)
+                    PointerRenderer.material.shader = pointerShader;
+                PointerRenderer.material.color = gunLocked || ControllerInputPoller.TriggerFloat(XRNode.RightHand) > 0.5f ? buttonColors[1].GetCurrentColor() : buttonColors[0].GetCurrentColor();
+            }
 
             Destroy(GunPointer.GetComponent<Collider>());
 
