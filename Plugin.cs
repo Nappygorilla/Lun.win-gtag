@@ -11,7 +11,15 @@ namespace StupidTemplate
 
         private void Awake()
         {
-            Configuration.Initialize(Config);
+            try
+            {
+                Configuration.Initialize(Config);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[{PluginInfo.Name}] Configuration initialization failed: {ex}");
+                return;
+            }
 
             try
             {
@@ -42,6 +50,18 @@ namespace StupidTemplate
         private void Start()
         {
             Debug.Log($"Loaded: {PluginInfo.Name} v{PluginInfo.Version}");
+        }
+
+        private void OnDestroy()
+        {
+            try
+            {
+                Patches.PatchHandler.UnpatchAll();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[{PluginInfo.Name}] Failed to clean up patches: {ex}");
+            }
         }
     }
 }
