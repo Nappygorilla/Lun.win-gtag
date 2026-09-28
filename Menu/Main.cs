@@ -58,7 +58,7 @@ namespace StupidTemplate.Menu
                         RecenterMenu(rightHanded, keyboardOpen);
                     else
                     {
-                        GameObject.Find("Shoulder Camera").transform.Find("CM vcam1").gameObject.SetActive(true);
+                        SetThirdPersonCameraEnabled(true);
 
                         Rigidbody comp = menu.AddComponent(typeof(Rigidbody)) as Rigidbody;
                         comp.linearVelocity = (rightHanded ? GTPlayer.Instance.LeftHand.velocityTracker : GTPlayer.Instance.RightHand.velocityTracker).GetAverageVelocity(true, 0);
@@ -105,7 +105,8 @@ namespace StupidTemplate.Menu
             {
                 // Pre-Execution
                 if (fpsObject != null)
-                    fpsObject.text = "FPS: " + Mathf.Ceil(1f / Time.unscaledDeltaTime).ToString();
+                    float deltaTime = Time.unscaledDeltaTime;
+                fpsObject.text = "FPS: " + (deltaTime > Mathf.Epsilon ? Mathf.Ceil(1f / deltaTime).ToString() : "0");
 
                 // Execute Enabled Mods
                 foreach (ButtonInfo button in buttons
@@ -406,11 +407,13 @@ namespace StupidTemplate.Menu
             {
                 try
                 {
-                    TPC = GameObject.Find("Player Objects/Third Person Camera/Shoulder Camera").GetComponent<Camera>();
+                    GameObject shoulderCamera = GameObject.Find("Player Objects/Third Person Camera/Shoulder Camera");
+                    if (shoulderCamera != null)
+                        TPC = shoulderCamera.GetComponent<Camera>();
                 }
                 catch { }
 
-                GameObject.Find("Shoulder Camera").transform.Find("CM vcam1").gameObject.SetActive(false);
+                SetThirdPersonCameraEnabled(false);
 
                 if (TPC != null)
                 {
@@ -442,6 +445,21 @@ namespace StupidTemplate.Menu
                             reference.transform.position = new Vector3(999f, -999f, -999f);
                     }
                 }
+            }
+        }
+
+        private static void SetThirdPersonCameraEnabled(bool enabled)
+        {
+            try
+            {
+                GameObject shoulderCamera = GameObject.Find("Shoulder Camera");
+                Transform vcam = shoulderCamera?.transform.Find("CM vcam1");
+                if (vcam != null)
+                    vcam.gameObject.SetActive(enabled);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{PluginInfo.Name}] Failed to toggle third-person camera: {ex.Message}");
             }
         }
 
