@@ -29,6 +29,11 @@ namespace StupidTemplate.Classes
             if (copyRigColor)
                 return RigManager.GetPlayerColor(VRRig.LocalRig);
 
+            if (colors == null || colors.Length == 0)
+                return Color.magenta;
+
+            index = Mathf.Clamp(index, 0, colors.Length - 1);
+
             if (transparent)
             {
                 Color targetColor = colors[index].color;
@@ -53,8 +58,16 @@ namespace StupidTemplate.Classes
 
             customColor = null;
 
+            if (colors == null || colors.Length == 0)
+            {
+                colors = GetSolidGradient(color);
+                return;
+            }
+
+            index = Mathf.Clamp(index, 0, colors.Length - 1);
+
             if (colors.Length <= 2)
-                colors = GetSimpleGradient(colors[0].color, colors[^1].color);
+                colors = GetSimpleGradient(colors[0].color, colors[colors.Length - 1].color);
 
             if (setMirror && index == 0)
             {
@@ -75,6 +88,12 @@ namespace StupidTemplate.Classes
 
             customColor = null;
 
+            if (colors == null || colors.Length == 0)
+            {
+                colors = GetSolidGradient(color);
+                return;
+            }
+
             for (int i = 0; i < colors.Length; i++)
                 colors[i].color = color;
         }
@@ -93,6 +112,11 @@ namespace StupidTemplate.Classes
             if (copyRigColor)
                 return RigManager.GetPlayerColor(VRRig.LocalRig);
 
+            if (colors == null || colors.Length == 0)
+                return Color.magenta;
+
+            time = Mathf.Repeat(time, 1f);
+
             if (transparent)
             {
                 Color targetColor = new Gradient { colorKeys = colors }.Evaluate(time);
@@ -108,11 +132,11 @@ namespace StupidTemplate.Classes
         }
 
         public Color GetCurrentColor(float offset = 0f) =>
-            GetColorTime((offset + (Time.time * Settings.gradientSpeed)) % 1f);
+            GetColorTime(Mathf.Repeat(offset + (Time.time * Settings.gradientSpeed), 1f));
 
         public bool IsFlat() =>
             !rainbow && !pastelRainbow && !epileptic && !copyRigColor &&
-            colors.Length > 0 && colors.All(key => key.color == colors[0].color);
+            colors != null && colors.Length > 0 && colors.All(key => key.color == colors[0].color);
 
         public ExtGradient Clone()
         {
@@ -123,7 +147,7 @@ namespace StupidTemplate.Classes
                 epileptic = epileptic,
                 copyRigColor = copyRigColor,
                 customColor = customColor,
-                colors = colors.Select(c => new GradientColorKey(c.color, c.time)).ToArray()
+                colors = colors == null ? GetSolidGradient(Color.magenta) : colors.Select(c => new GradientColorKey(c.color, c.time)).ToArray()
             };
         }
 
