@@ -7,15 +7,39 @@ namespace StupidTemplate
     [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
     public class HarmonyPatches : BaseUnityPlugin
     {
-        private void Awake() =>
-            GorillaTagger.OnPlayerSpawned(OnPlayerSpawned);
+        private bool spawnHooked;
 
-        public void OnPlayerSpawned() =>
-            Patches.PatchHandler.PatchAll();
-
-        void Start()
+        private void Awake()
         {
-            Debug.Log("Loaded:" +PluginInfo.Name + "Version" + PluginInfo.Version);
+            try
+            {
+                if (!spawnHooked)
+                {
+                    GorillaTagger.OnPlayerSpawned(OnPlayerSpawned);
+                    spawnHooked = true;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[{PluginInfo.Name}] Failed to register player-spawn callback: {ex}");
+            }
+        }
+
+        public void OnPlayerSpawned()
+        {
+            try
+            {
+                Patches.PatchHandler.PatchAll();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[{PluginInfo.Name}] Failed to apply patches: {ex}");
+            }
+        }
+
+        private void Start()
+        {
+            Debug.Log($"Loaded: {PluginInfo.Name} v{PluginInfo.Version}");
         }
     }
 }
