@@ -16,7 +16,8 @@ namespace StupidTemplate
                 $"<color=white>Lun.win status</color>\\n" +
                 $"Game: {Application.version}\\n" +
                 $"Plugin: {PluginInfo.Version}\\n" +
-                $"Patches: {patchState} ({Patches.PatchHandler.PatchErrors} errors)" + Environment.NewLine);
+                $"Patches: {patchState} ({Patches.PatchHandler.PatchErrors} errors){Environment.NewLine}" +
+                $"Frame: {Time.unscaledDeltaTime * 1000f:0.0} ms" + Environment.NewLine);
         }
 
         public static void ShowPatchErrors()
@@ -39,7 +40,6 @@ namespace StupidTemplate
         public static void ResetSettings()
         {
             Configuration.ResetToDefaults();
-            Main.RecreateMenu();
             NotifiLib.SendNotification("<color=green>Settings reset to defaults.</color>");
         }
 
