@@ -31,6 +31,21 @@ namespace StupidTemplate.Mods
         }
 
 
+        public static void DisablePlatforms()
+        {
+            if (leftplat != null)
+            {
+                Object.Destroy(leftplat);
+                leftplat = null;
+            }
+
+            if (rightplat != null)
+            {
+                Object.Destroy(rightplat);
+                rightplat = null;
+            }
+        }
+
         public static void Platforms()
         {
             if (ControllerInputPoller.instance.leftGrab && leftplat == null)
