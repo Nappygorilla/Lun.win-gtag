@@ -1,4 +1,5 @@
-﻿using static StupidTemplate.Menu.Main;
+﻿using StupidTemplate.Classes;
+using static StupidTemplate.Menu.Main;
 
 namespace StupidTemplate.Mods.Settings
 {
@@ -14,8 +15,11 @@ namespace StupidTemplate.Mods.Settings
 
             flySpeedIndex++;
             flySpeedIndex %= speedNames.Length;
+            flySpeed = speedValues[flySpeedIndex];
 
-            GetIndex("Change Fly Speed").overlapText = $"Change Fly Speed [{speedNames[flySpeedIndex]}]";
+            ButtonInfo button = GetIndex("Change Fly Speed");
+            if (button != null)
+                button.overlapText = $"Change Fly Speed [{speedNames[flySpeedIndex]}]";
         }
     }
 }
