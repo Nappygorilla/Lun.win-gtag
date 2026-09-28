@@ -11,6 +11,8 @@ namespace StupidTemplate
 
         private void Awake()
         {
+            Configuration.Initialize(Config);
+
             try
             {
                 if (!spawnHooked)
