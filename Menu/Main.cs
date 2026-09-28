@@ -710,7 +710,9 @@ namespace StupidTemplate.Menu
             }
 
             GunLine.gameObject.SetActive(true);
-            GunLine.material.shader = Shader.Find("GUI/Text Shader");
+            Shader lineShader = Shader.Find("GUI/Text Shader");
+            if (lineShader != null)
+                GunLine.material.shader = lineShader;
             GunLine.startColor = backgroundColor.GetCurrentColor();
             GunLine.endColor = backgroundColor.GetCurrentColor(0.5f);
             GunLine.startWidth = 0.025f;
