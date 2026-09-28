@@ -39,6 +39,7 @@ namespace StupidTemplate
         public static void ResetSettings()
         {
             Configuration.ResetToDefaults();
+            Main.RecreateMenu();
             NotifiLib.SendNotification("<color=green>Settings reset to defaults.</color>");
         }
 
