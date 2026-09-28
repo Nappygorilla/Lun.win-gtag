@@ -1,9 +1,7 @@
 ﻿using GorillaLocomotion;
 using StupidTemplate.Classes;
 using StupidTemplate.Notifications;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.XR;
 using static StupidTemplate.Classes.RigManager;
 using static StupidTemplate.Menu.Main;
 
@@ -14,9 +12,11 @@ namespace StupidTemplate.Mods
         public static VRRig reportRig; 
         public static void AntiReport(System.Action<VRRig, Vector3> onReport)
         {
-            if (!NetworkSystem.Instance.InRoom) return;
+            if (NetworkSystem.Instance == null || !NetworkSystem.Instance.InRoom || GorillaParent.instance == null)
+                return;
 
             if (reportRig != null)
+            {
             {
                 onReport?.Invoke(reportRig, reportRig.transform.position);
                 reportRig = null;
@@ -26,10 +26,23 @@ namespace StupidTemplate.Mods
             foreach (GorillaPlayerScoreboardLine line in GorillaScoreboardTotalUpdater.allScoreboardLines)
             {
                 if (line.linePlayer != NetworkSystem.Instance.LocalPlayer) continue;
-                Transform report = line.reportButton.gameObject.transform;
+                if (line == null || line.reportButton == null)
+                    continue;
 
-                foreach (var vrrig in from vrrig in GorillaParent.instance.vrrigs where !vrrig.isLocal let D1 = Vector3.Distance(vrrig.rightHandTransform.position, report.position) let D2 = Vector3.Distance(vrrig.leftHandTransform.position, report.position) where D1 < 0.35f || D2 < 0.35f select vrrig)
-                    onReport?.Invoke(vrrig, report.transform.position);
+                Transform report = line.reportButton.gameObject != null ? line.reportButton.gameObject.transform : null;
+                if (report == null)
+                    continue;
+
+                foreach (VRRig vrrig in GorillaParent.instance.vrrigs)
+                {
+                    if (vrrig == null || vrrig.isLocal || vrrig.rightHandTransform == null || vrrig.leftHandTransform == null)
+                        continue;
+
+                    float rightDistance = Vector3.Distance(vrrig.rightHandTransform.position, report.position);
+                    float leftDistance = Vector3.Distance(vrrig.leftHandTransform.position, report.position);
+                    if (rightDistance < 0.35f || leftDistance < 0.35f)
+                        onReport?.Invoke(vrrig, report.position);
+                }
             }
         }
 
@@ -42,7 +55,9 @@ namespace StupidTemplate.Mods
 
                 if (!(Time.time > antiReportDelay)) return;
                 antiReportDelay = Time.time + 1f;
-                NotifiLib.SendNotification("<color=grey>[</color><color=purple>ANTI-REPORT</color><color=grey>]</color> " + GetPlayerFromVRRig(vrrig).NickName + " attempted to report you, you have been disconnected.");
+                var player = GetPlayerFromVRRig(vrrig);
+                string playerName = player != null && !string.IsNullOrEmpty(player.NickName) ? player.NickName : "Unknown Player";
+                NotifiLib.SendNotification("<color=grey>[</color><color=purple>ANTI-REPORT</color><color=grey>]</color> " + playerName + " attempted to report you, you have been disconnected.");
             });
         }
     }
