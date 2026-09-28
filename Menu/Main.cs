@@ -36,6 +36,9 @@ namespace StupidTemplate.Menu
         // Constant
         public static void Prefix()
         {
+            if (GTPlayer.Instance == null || GorillaTagger.Instance == null || ControllerInputPoller.instance == null)
+                return;
+
             // Initialize Menu
             try
             {
@@ -134,6 +137,11 @@ namespace StupidTemplate.Menu
         // Functions
         public static void CreateMenu()
         {
+            if (currentCategory == 11)
+                PlayerInfo.RefreshData();
+
+            ApplyMenuScale();
+
             // Menu Holder
             menu = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Destroy(menu.GetComponent<Rigidbody>());
