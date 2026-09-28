@@ -18,6 +18,12 @@ namespace StupidTemplate.Notifications
         private void Init()
         {
             this.MainCamera = GameObject.Find("Main Camera");
+            if (this.MainCamera == null)
+                return;
+
+            Camera camera = this.MainCamera.GetComponent<Camera>();
+            if (camera == null)
+                return;
             this.HUDObj = new GameObject();
             this.HUDObj2 = new GameObject();
             this.HUDObj2.name = "NOTIFICATIONLIB_HUD_OBJ";
@@ -27,10 +33,10 @@ namespace StupidTemplate.Notifications
             this.HUDObj.AddComponent<GraphicRaycaster>();
             this.HUDObj.GetComponent<Canvas>().enabled = true;
             this.HUDObj.GetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
-            this.HUDObj.GetComponent<Canvas>().worldCamera = this.MainCamera.GetComponent<Camera>();
+            this.HUDObj.GetComponent<Canvas>().worldCamera = camera;
             this.HUDObj.GetComponent<RectTransform>().sizeDelta = new Vector2(5f, 5f);
             this.HUDObj.GetComponent<RectTransform>().position = new Vector3(this.MainCamera.transform.position.x, this.MainCamera.transform.position.y, this.MainCamera.transform.position.z);
-            this.HUDObj2.transform.position = new Vector3(this.MainCamera.transform.position.x, this.MainCamera.transform.position.y, this.MainCamera.transform.position.z - 4.6f);
+            this.HUDObj2.transform.position = this.MainCamera.transform.position + (this.MainCamera.transform.forward * -4.6f);
             this.HUDObj.transform.parent = this.HUDObj2.transform;
             this.HUDObj.GetComponent<RectTransform>().localPosition = new Vector3(0f, 0f, 1.6f);
             Vector3 eulerAngles = this.HUDObj.GetComponent<RectTransform>().rotation.eulerAngles;
@@ -57,6 +63,18 @@ namespace StupidTemplate.Notifications
 
         private void FixedUpdate()
         {
+            if (this.MainCamera == null || this.HUDObj2 == null || this.Testtext == null)
+            {
+                if (GameObject.Find("Main Camera") != null)
+                {
+                    Init();
+                    this.HasInit = this.MainCamera != null && this.HUDObj2 != null && this.Testtext != null;
+                }
+
+                if (!this.HasInit)
+                    return;
+            }
+
             bool flag = !this.HasInit && GameObject.Find("Main Camera") != null;
             if (flag)
             {
@@ -116,12 +134,18 @@ namespace StupidTemplate.Notifications
 
         public static void ClearAllNotifications()
         {
+            if (NotifiText == null)
+                return;
+
             //NotifiLib.NotifiText.text = "<color=grey>[</color><color=green>☑</color><color=grey>]</color> <color=white>Cleared</color>" + Environment.NewLine;
             NotifiText.text = "";
         }
 
         public static void ClearPastNotifications(int amount)
         {
+            if (NotifiText == null)
+                return;
+
             string text = "";
             foreach (string text2 in Enumerable.ToArray(Enumerable.Skip(NotifiText.text.Split(Environment.NewLine.ToCharArray()), amount)))
             {
