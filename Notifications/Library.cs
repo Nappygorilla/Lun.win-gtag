@@ -120,7 +120,13 @@ namespace StupidTemplate.Notifications
                         {
                             NotificationText += Environment.NewLine;
                         }
-                        NotifiText.text = NotifiText.text + NotificationText;
+                        string[] existing = NotifiText.text.Split(new[] { '\\r', '\\n' }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] incoming = NotificationText.Split(new[] { '\\r', '\\n' }, StringSplitOptions.RemoveEmptyEntries);
+                        var lines = existing.Concat(incoming).ToArray();
+                        if (lines.Length > MaxNotifications)
+                            lines = lines.Skip(lines.Length - MaxNotifications).ToArray();
+
+                        NotifiText.text = string.Join(Environment.NewLine, lines) + Environment.NewLine;
                         NotifiText.supportRichText = true;
                         PreviousNotifi = NotificationText;
                     }
@@ -167,7 +173,8 @@ namespace StupidTemplate.Notifications
 
         private Material AlertText = new Material(Shader.Find("GUI/Text Shader"));
 
-        private int NotificationDecayTime = 144;
+        private const int NotificationDecayTime = 144;
+        private const int MaxNotifications = 8;
 
         private int NotificationDecayTimeCounter;
 
