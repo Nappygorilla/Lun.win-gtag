@@ -172,7 +172,7 @@ namespace StupidTemplate.Notifications
 
         private Text Testtext;
 
-        private Material AlertText = new Material(Shader.Find("GUI/Text Shader"));
+        private Material AlertText;
 
         private const int MaxNotifications = 8;
 
