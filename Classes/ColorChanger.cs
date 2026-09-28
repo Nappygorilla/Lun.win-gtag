@@ -13,6 +13,11 @@ namespace StupidTemplate.Classes
             }
 
             targetRenderer = GetComponent<Renderer>();
+            if (targetRenderer == null || colors == null)
+            {
+                Destroy(this);
+                return;
+            }
 
             if (colors.IsFlat())
             {
@@ -26,6 +31,9 @@ namespace StupidTemplate.Classes
 
         public void Update()
         {
+            if (targetRenderer == null || colors == null)
+                return;
+
             targetRenderer.enabled = !colors.transparent;
 
             if (colors.transparent)
