@@ -50,6 +50,10 @@ namespace StupidTemplate
         public static bool disableNotifications;
 
         public static KeyCode keyboardButton = KeyCode.Q;
+        public static float notificationDurationSeconds = 3f;
+
+        public static readonly KeyCode[] menuKeys = { KeyCode.Q, KeyCode.E, KeyCode.Tab, KeyCode.F2 };
+        public static readonly string[] menuKeyNames = { "Q", "E", "TAB", "F2" };
 
         public static Vector3 menuSize = new Vector3(0.1f, 1f, 1f); // Depth, width, height
         public static int buttonsPerPage = 8;
@@ -60,6 +64,36 @@ namespace StupidTemplate
         public static int menuScaleIndex = 1;
         public static int themeIndex = 0;
 
+
+        public static KeyCode GetValidMenuKey(int value)
+        {
+            for (int i = 0; i < menuKeys.Length; i++)
+            {
+                if ((int)menuKeys[i] == value)
+                    return menuKeys[i];
+            }
+
+            return KeyCode.Q;
+        }
+
+        public static void NextKeyboardButton()
+        {
+            int index = 0;
+            for (int i = 0; i < menuKeys.Length; i++)
+            {
+                if (menuKeys[i] == keyboardButton)
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            index = (index + 1) % menuKeys.Length;
+            keyboardButton = menuKeys[index];
+            Classes.ButtonInfo button = Menu.Main.GetIndex("Menu Key");
+            if (button != null)
+                button.overlapText = "Menu Key [" + menuKeyNames[index] + "]";
+        }
 
         public static void NextMenuScale()
         {
