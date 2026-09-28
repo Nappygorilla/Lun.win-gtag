@@ -10,6 +10,7 @@ namespace StupidTemplate
         {
             Settings.themeIndex = (Settings.themeIndex + 1) % ThemeNames.Length;
             ApplyTheme(Settings.themeIndex);
+            Configuration.Save();
         }
 
         public static void ApplyTheme(int index)
