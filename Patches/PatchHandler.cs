@@ -18,8 +18,20 @@ namespace StupidTemplate.Patches
             {
                 instance ??= new Harmony(PluginInfo.GUID);
 
-                foreach (var type in Assembly.GetExecutingAssembly().GetTypes()
-                    .Where(t => t != null && t.IsClass && t.GetCustomAttribute<HarmonyPatch>() != null))
+                Type[] types;
+                try
+                {
+                    types = Assembly.GetExecutingAssembly().GetTypes();
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    types = ex.Types.Where(t => t != null).ToArray();
+                    Debug.LogError("One or more plugin types could not be loaded while discovering Harmony patches.");
+                    foreach (Exception loaderException in ex.LoaderExceptions ?? Array.Empty<Exception>())
+                        Debug.LogError(loaderException);
+                }
+
+                foreach (Type type in types.Where(t => t != null && t.IsClass && t.GetCustomAttribute<HarmonyPatch>() != null))
                 {
                     try
                     {
@@ -32,7 +44,7 @@ namespace StupidTemplate.Patches
                     }
                 }
 
-                Debug.Log($"Patched with {PatchErrors} errors");
+                Debug.Log($"Patch pass complete: {PatchErrors} error(s).");
 
                 IsPatched = true;
             }
