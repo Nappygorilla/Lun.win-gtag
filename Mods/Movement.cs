@@ -1,5 +1,4 @@
-﻿using BepInEx;
-using GorillaLocomotion;
+﻿using GorillaLocomotion;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR;
@@ -27,7 +26,6 @@ namespace StupidTemplate.Mods
             plat.transform.position = handTransform.position;
             plat.transform.rotation = handTransform.rotation;
 
-            float h = (Time.frameCount / 180f) % 1f;
             plat.GetComponent<Renderer>().material.color = UnityEngine.Color.mintCream;
             return plat;
         }
@@ -47,7 +45,8 @@ namespace StupidTemplate.Mods
 
             if (ControllerInputPoller.instance.rightGrabRelease && rightplat != null)
             {
-                rightplat.Disable();
+                rightplat.SetActive(false);
+                Object.Destroy(rightplat);
                 rightplat = null;
             }
 
@@ -55,8 +54,8 @@ namespace StupidTemplate.Mods
             {
                 return;
             }
-            leftplat.Disable();
-            ;
+            leftplat.SetActive(false);
+            Object.Destroy(leftplat);
             leftplat = null;
         }
         private static GameObject leftplat;
@@ -103,12 +102,10 @@ namespace StupidTemplate.Mods
             bool Shift = UnityInput.Current.GetKey(KeyCode.LeftShift);
             bool Alt = UnityInput.Current.GetKey(KeyCode.LeftAlt);
 
-            if (true || W || A || S || D || Space || Ctrl)
-                GorillaTagger.Instance.rigidbody.linearVelocity = Vector3.zero;
+            GorillaTagger.Instance.rigidbody.linearVelocity = Vector3.zero;
 
-            if (true)
             {
-                if (Mouse.current.rightButton.isPressed)
+                if (Mouse.current != null && Mouse.current.rightButton.isPressed)
                 {
                     Transform parentTransform = GTPlayer.Instance.GetControllerTransform(false).parent;
                     Quaternion currentRotation = parentTransform.rotation;
