@@ -24,6 +24,11 @@ namespace StupidTemplate.Notifications
             Camera camera = this.MainCamera.GetComponent<Camera>();
             if (camera == null)
                 return;
+            Shader notificationShader = Shader.Find("GUI/Text Shader");
+            if (notificationShader == null)
+                return;
+
+            this.AlertText = new Material(notificationShader);
             this.HUDObj = new GameObject();
             this.HUDObj2 = new GameObject();
             this.HUDObj2.name = "NOTIFICATIONLIB_HUD_OBJ";
@@ -57,7 +62,8 @@ namespace StupidTemplate.Notifications
             this.Testtext.alignment = TextAnchor.LowerLeft;
             this.Testtext.rectTransform.localScale = new Vector3(0.00333333333f, 0.00333333333f, 0.33333333f);
             this.Testtext.rectTransform.localPosition = new Vector3(-1f, -1f, -0.5f);
-            this.Testtext.material = this.AlertText;
+            if (this.AlertText != null)
+                this.Testtext.material = this.AlertText;
             NotifiText = this.Testtext;
         }
 
@@ -75,22 +81,17 @@ namespace StupidTemplate.Notifications
                     return;
             }
 
-            bool flag = !this.HasInit && GameObject.Find("Main Camera") != null;
-            if (flag)
-            {
-                this.Init();
-                this.HasInit = true;
-            }
             this.HUDObj2.transform.position = new Vector3(this.MainCamera.transform.position.x, this.MainCamera.transform.position.y, this.MainCamera.transform.position.z);
             this.HUDObj2.transform.rotation = this.MainCamera.transform.rotation;
             if (this.Testtext.text != "")
             {
-                this.NotificationDecayTimeCounter++;
-                if (this.NotificationDecayTimeCounter > this.NotificationDecayTime)
+                this.NotificationDecayTimeCounter += Time.fixedDeltaTime;
+                float decayTime = Mathf.Max(0.5f, Settings.notificationDurationSeconds);
+                if (this.NotificationDecayTimeCounter >= decayTime)
                 {
                     this.Notifilines = null;
                     this.newtext = "";
-                    this.NotificationDecayTimeCounter = 0;
+                    this.NotificationDecayTimeCounter = 0f;
                     this.Notifilines = Enumerable.ToArray(Enumerable.Skip(this.Testtext.text.Split(Environment.NewLine.ToCharArray()), 1));
                     foreach (string text in this.Notifilines)
                     {
@@ -114,7 +115,7 @@ namespace StupidTemplate.Notifications
             {
                 try
                 {
-                    if (IsEnabled && PreviousNotifi != NotificationText)
+                    if (IsEnabled && NotifiText != null && !string.IsNullOrWhiteSpace(NotificationText) && PreviousNotifi != NotificationText)
                     {
                         if (!NotificationText.Contains(Environment.NewLine))
                         {
@@ -173,10 +174,9 @@ namespace StupidTemplate.Notifications
 
         private Material AlertText = new Material(Shader.Find("GUI/Text Shader"));
 
-        private const int NotificationDecayTime = 144;
         private const int MaxNotifications = 8;
 
-        private int NotificationDecayTimeCounter;
+        private float NotificationDecayTimeCounter;
 
         public static int NoticationThreshold = 30;
 
