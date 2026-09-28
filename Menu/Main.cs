@@ -535,6 +535,7 @@ namespace StupidTemplate.Menu
                         Debug.LogError(buttonText + " does not exist");
                 }
             }
+            Configuration.Save();
             RecreateMenu();
         }
 
