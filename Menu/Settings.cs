@@ -55,5 +55,49 @@ namespace StupidTemplate
         public static int buttonsPerPage = 8;
 
         public static float gradientSpeed = 0.5f; // Speed of colors
+
+        public static readonly string[] menuScaleNames = { "Small", "Normal", "Large", "Huge" };
+        public static int menuScaleIndex = 1;
+        public static int themeIndex = 0;
+
+
+        public static void NextMenuScale()
+        {
+            menuScaleIndex = (menuScaleIndex + 1) % menuScaleNames.Length;
+            ApplyMenuScale();
+            Classes.ButtonInfo button = Menu.Main.GetIndex("Menu Scale");
+            if (button != null)
+                button.overlapText = "Menu Scale [" + menuScaleNames[menuScaleIndex] + "]";
+        }
+
+        public static void NextGradientSpeed()
+        {
+            float[] speeds = { 0.25f, 0.5f, 0.75f, 1f };
+            int index = 0;
+            float closest = float.MaxValue;
+            for (int i = 0; i < speeds.Length; i++)
+            {
+                float distance = Mathf.Abs(gradientSpeed - speeds[i]);
+                if (distance < closest)
+                {
+                    closest = distance;
+                    index = i;
+                }
+            }
+
+            index = (index + 1) % speeds.Length;
+            gradientSpeed = speeds[index];
+            Classes.ButtonInfo button = Menu.Main.GetIndex("Gradient Speed");
+            if (button != null)
+                button.overlapText = "Gradient Speed [" + gradientSpeed.ToString("0.##") + "]";
+        }
+
+        public static void ApplyMenuScale()
+        {
+            float[] scales = { 0.8f, 1f, 1.2f, 1.4f };
+            menuScaleIndex = Mathf.Clamp(menuScaleIndex, 0, scales.Length - 1);
+            float scale = scales[menuScaleIndex];
+            menuSize = new Vector3(0.1f, 1f, 1f) * scale;
+        }
     }
 }
