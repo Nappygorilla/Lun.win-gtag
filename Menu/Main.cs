@@ -105,8 +105,10 @@ namespace StupidTemplate.Menu
             {
                 // Pre-Execution
                 if (fpsObject != null)
+                {
                     float deltaTime = Time.unscaledDeltaTime;
-                fpsObject.text = "FPS: " + (deltaTime > Mathf.Epsilon ? Mathf.Ceil(1f / deltaTime).ToString() : "0");
+                    fpsObject.text = "FPS: " + (deltaTime > Mathf.Epsilon ? Mathf.Ceil(1f / deltaTime).ToString() : "0");
+                }
 
                 // Execute Enabled Mods
                 foreach (ButtonInfo button in buttons
