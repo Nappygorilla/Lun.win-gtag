@@ -7,51 +7,87 @@ namespace StupidTemplate.Classes
 {
     public class RigManager
     {
-        public static VRRig GetVRRigFromPlayer(Player p) =>
-            GorillaGameManager.instance.FindPlayerVRRig(p);
+        public static VRRig GetVRRigFromPlayer(Player p)
+        {
+            if (p == null || GorillaGameManager.instance == null)
+                return null;
+
+            return GorillaGameManager.instance.FindPlayerVRRig(p);
+        }
 
         public static VRRig GetRandomVRRig(bool includeSelf)
         {
-            VRRig random = VRRigCache.ActiveRigs[Random.Range(0, VRRigCache.ActiveRigs.Count - 1)];
-            if (includeSelf)
-                return random;
-            else
+            if (VRRigCache.ActiveRigs == null || VRRigCache.ActiveRigs.Count == 0)
+                return null;
+
+            if (includeSelf || VRRigCache.ActiveRigs.Count == 1)
+                return VRRigCache.ActiveRigs[Random.Range(0, VRRigCache.ActiveRigs.Count)];
+
+            int attempts = VRRigCache.ActiveRigs.Count;
+            while (attempts-- > 0)
             {
-                if (random != VRRig.LocalRig)
+                VRRig random = VRRigCache.ActiveRigs[Random.Range(0, VRRigCache.ActiveRigs.Count)];
+                if (random != null && random != VRRig.LocalRig)
                     return random;
-                else
-                    return GetRandomVRRig(includeSelf);
             }
+
+            return null;
         }
 
         public static VRRig GetClosestVRRig()
         {
-            float num = float.MaxValue;
-            VRRig outRig = null;
+            if (VRRigCache.ActiveRigs == null || GorillaTagger.Instance?.bodyCollider == null)
+                return null;
+
+            float closestDistance = float.MaxValue;
+            VRRig closestRig = null;
+            Vector3 origin = GorillaTagger.Instance.bodyCollider.transform.position;
+
             foreach (VRRig vrrig in VRRigCache.ActiveRigs)
             {
-                if (Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position) < num)
+                if (vrrig == null)
+                    continue;
+
+                float distance = Vector3.Distance(origin, vrrig.transform.position);
+                if (distance < closestDistance)
                 {
-                    num = Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position);
-                    outRig = vrrig;
+                    closestDistance = distance;
+                    closestRig = vrrig;
                 }
             }
-            return outRig;
+
+            return closestRig;
         }
 
-        public static PhotonView GetPhotonViewFromVRRig(VRRig p) =>
-            (PhotonView)Traverse.Create(p).Field("photonView").GetValue();
+        public static PhotonView GetPhotonViewFromVRRig(VRRig p)
+        {
+            if (p == null)
+                return null;
+
+            try
+            {
+                return (PhotonView)Traverse.Create(p).Field("photonView").GetValue();
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         public static Player GetRandomPlayer(bool includeSelf)
         {
-            if (includeSelf)
-                return PhotonNetwork.PlayerList[Random.Range(0, PhotonNetwork.PlayerList.Length - 1)];
-            else
-                return PhotonNetwork.PlayerListOthers[Random.Range(0, PhotonNetwork.PlayerListOthers.Length - 1)];
+            Player[] players = includeSelf ? PhotonNetwork.PlayerList : PhotonNetwork.PlayerListOthers;
+            if (players == null || players.Length == 0)
+                return null;
+
+            return players[Random.Range(0, players.Length)];
         }
 
-        public static Player GetPlayerFromVRRig(VRRig p) =>
-            GetPhotonViewFromVRRig(p).Owner;
+        public static Player GetPlayerFromVRRig(VRRig p)
+        {
+            PhotonView view = GetPhotonViewFromVRRig(p);
+            return view != null ? view.Owner : null;
+        }
 
         public static Player GetPlayerFromID(string id)
         {
@@ -69,6 +105,8 @@ namespace StupidTemplate.Classes
 
         public static Color GetPlayerColor(VRRig Player)
         {
+            if (Player == null)
+                return Color.white;
 
             switch (Player.setMatIndex)
             {
