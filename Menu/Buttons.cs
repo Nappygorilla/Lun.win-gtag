@@ -16,7 +16,7 @@ namespace StupidTemplate.Menu
          *   new ButtonInfo { buttonText = "Return to Main", method =() => currentCategory = 0, isTogglable = false, toolTip = "Returns to the main page of the menu."},
          * 
          * Togglable Mod:
-         *   new ButtonInfo { buttonText = "Platforms", method =() => Movement.Platforms(), toolTip = "Spawns platforms on your hands when pressing grip."},
+         *   new ButtonInfo { buttonText = "Platforms", method =() => Movement.Platforms(), disableMethod =() => Movement.DisablePlatforms(), toolTip = "Spawns platforms on your hands when pressing grip."},
          *   
          * Making mods enabled by default:
          *  new ButtonInfo { buttonText = "Gunlib Fix", method =() => currentCategory = 0, isTogglable = true, toolTip = "Fixes issue With IItemp Gunlib not disabling", enabled = true },
