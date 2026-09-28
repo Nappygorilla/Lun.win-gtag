@@ -40,14 +40,19 @@ namespace StupidTemplate.Menu
                 new ButtonInfo { buttonText = "Return to Main", method =() => currentCategory = 0, isTogglable = false, toolTip = "Returns to the main page of the menu."},
                 new ButtonInfo { buttonText = "Menu", method =() => currentCategory = 2, isTogglable = false, toolTip = "Opens the settings for the menu."},
                 new ButtonInfo { buttonText = "Movement", method =() => currentCategory = 3, isTogglable = false, toolTip = "Opens the movement settings for the menu."},
+                new ButtonInfo { buttonText = "Player Info", method =() => currentCategory = 11, isTogglable = false, toolTip = "Shows players currently visible to Photon."},
+                new ButtonInfo { buttonText = "Diagnostics", method =() => currentCategory = 12, isTogglable = false, toolTip = "Shows plugin and patch diagnostics."},
             },
 
             new ButtonInfo[] { // Menu Settings [2]
                 new ButtonInfo { buttonText = "Return to Settings", method =() => currentCategory = 1, isTogglable = false, toolTip = "Returns to the main settings page for the menu."},
-                new ButtonInfo { buttonText = "Right Hand", enableMethod =() => rightHanded = true, disableMethod =() => rightHanded = false, toolTip = "Puts the menu on your right hand."},
+                new ButtonInfo { buttonText = "Right Hand", enableMethod =() => rightHanded = true, disableMethod =() => rightHanded = false, enabled = rightHanded, toolTip = "Puts the menu on your right hand."},
                 new ButtonInfo { buttonText = "Notifications", enableMethod =() => disableNotifications = false, disableMethod =() => disableNotifications = true, enabled = !disableNotifications, toolTip = "Toggles the notifications."},
                 new ButtonInfo { buttonText = "FPS Counter", enableMethod =() => fpsCounter = true, disableMethod =() => fpsCounter = false, enabled = fpsCounter, toolTip = "Toggles the FPS counter."},
                 new ButtonInfo { buttonText = "Disconnect Button", enableMethod =() => disconnectButton = true, disableMethod =() => disconnectButton = false, enabled = disconnectButton, toolTip = "Toggles the disconnect button."},
+                new ButtonInfo { buttonText = "Theme", overlapText = "Theme [Lunar]", method =() => ThemeManager.NextTheme(), isTogglable = false, toolTip = "Cycles menu theme presets."},
+                new ButtonInfo { buttonText = "Menu Scale", overlapText = "Menu Scale [Normal]", method =() => Settings.NextMenuScale(), isTogglable = false, toolTip = "Cycles the menu size."},
+                new ButtonInfo { buttonText = "Gradient Speed", overlapText = "Gradient Speed [0.5]", method =() => Settings.NextGradientSpeed(), isTogglable = false, toolTip = "Cycles menu animation speed."},
             },
 
             new ButtonInfo[] { // Movement Settings [3]
