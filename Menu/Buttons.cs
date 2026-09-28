@@ -53,6 +53,7 @@ namespace StupidTemplate.Menu
                 new ButtonInfo { buttonText = "Theme", overlapText = "Theme [Lunar]", method =() => ThemeManager.NextTheme(), isTogglable = false, toolTip = "Cycles menu theme presets."},
                 new ButtonInfo { buttonText = "Menu Scale", overlapText = "Menu Scale [Normal]", method =() => Settings.NextMenuScale(), isTogglable = false, toolTip = "Cycles the menu size."},
                 new ButtonInfo { buttonText = "Gradient Speed", overlapText = "Gradient Speed [0.5]", method =() => Settings.NextGradientSpeed(), isTogglable = false, toolTip = "Cycles menu animation speed."},
+                new ButtonInfo { buttonText = "Menu Key", overlapText = "Menu Key [Q]", method =() => Settings.NextKeyboardButton(), isTogglable = false, toolTip = "Cycles the keyboard key used to open the menu."},
             },
 
             new ButtonInfo[] { // Movement Settings [3]
